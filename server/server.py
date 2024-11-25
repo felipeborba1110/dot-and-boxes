@@ -1,5 +1,5 @@
 import socket
-from servidor.watchdog import Watchdog
+from watchdog import Watchdog
 from tabuleiro import Tabuleiro
 
 localIP = "localhost"
@@ -131,15 +131,15 @@ def recieve_msg(cod, address):
 
     wd.set_player(address, player_name)
 
-    resposta: bytes
-
     bytes_adress_pair = UDPServerSocket.recvfrom(bufferSize)
     wd.refresh()
     resposta = bytes_adress_pair[0]
 
     wd.stop()
-
-    return resposta.decode()
+    
+    send_resposta = resposta.decode()
+    
+    return send_resposta
 
 def play_again():
     j = 0
