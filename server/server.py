@@ -65,6 +65,7 @@ def main():
 
     tab.addresses_management(addresses[0],addresses[1])
     wd.set_addresses(addresses[0],addresses[1])
+    wd.set_names(fila_espera[0],fila_espera[1])
 
     UDPServerSocket.sendto(str.encode("Jogo Ininicando...\n"), addresses[0])
     UDPServerSocket.sendto(str.encode("Jogo Ininicando...\n"), addresses[1])
@@ -119,20 +120,22 @@ def recieve_msg(cod, address):
 
     wd.start()
 
+    addrs = wd.get_addresses()
+    names = wd.get_names()
+
     player_name = ""
-    if address == addresses[0]:
-        player_name = fila_espera[0]
-    elif address == addresses[1]:
-        player_name = fila_espera[1]
+    if address == addrs[0]:
+        player_name = names[0]
+    elif address == addrs[1]:
+        player_name = names[1]
+
     wd.set_player(address, player_name)
 
     resposta: bytes
 
-    while True:
-        bytes_adress_pair = UDPServerSocket.recvfrom(bufferSize)
-        wd.refresh()
-        resposta = bytes_adress_pair[0]
-        break
+    bytes_adress_pair = UDPServerSocket.recvfrom(bufferSize)
+    wd.refresh()
+    resposta = bytes_adress_pair[0]
 
     wd.stop()
 
@@ -151,19 +154,6 @@ def play_again():
         elif message.decode() == "play_again_negative":
             send_msg("terminate", addresses[j])
         j += 1
-
-def play_again_player(address):
-    send_msg("play_again", address)
-    bytesAdressPair = UDPServerSocket.recvfrom(bufferSize)
-    message = bytesAdressPair[0]
-
-    if message.decode() == "play_again_positive":
-        play_again_addresses.append(address)
-        for i in addresses:
-            if address == addresses[i]:
-                play_again_names.append(fila_espera[i])
-    elif message.decode() == "play_again_negative":
-        send_msg("terminate", address)
 
 
 if __name__ == '__main__':
