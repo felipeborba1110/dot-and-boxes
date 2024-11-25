@@ -77,6 +77,8 @@ def main():
                 case "terminate":
                     print("Game ended...")
                     break
+                case "menu":
+                    menu(nick)
                 case _:
                     print(decodedmsg, end="")
         except ConnectionResetError:
