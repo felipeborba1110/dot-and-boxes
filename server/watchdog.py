@@ -67,8 +67,9 @@ class Watchdog:
         read_db = open("scoreboard.txt", "r")
         content = read_db.readlines()
         content_line = -1
-        i = 0
+        i = -1
         for line in content:
+            i += 1
             content_data = content[i].split(" : ")
             if content_data[0] == afk_player:
                 content_line = i
