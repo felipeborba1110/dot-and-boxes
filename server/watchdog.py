@@ -1,10 +1,15 @@
-import os
-import signal
 import threading
+import signal
+import os
+
+SERVER_HOST = "localhost"
+SERVER_PORT = 1111
 
 global _all_addresses
 global _active_address
 global _active_player
+global _player1_name
+global _player2_name
 global _player_name
 
 class Watchdog:
@@ -13,13 +18,23 @@ class Watchdog:
         self.timeout = timeout
         self._t = None
 
-    def do_expire(self):
-        #os.kill(os.getpid(),signal.SIGKILL)
-        os.kill(os.getpid(),signal.SIGINT)
-
     def set_addresses(self, address1: tuple, address2: tuple):
         global _all_addresses
         _all_addresses = [tuple(address1), tuple(address2)]
+
+    def set_names(self, player1_name, player2_name):
+        global _player1_name
+        global _player2_name
+
+        _player1_name = player1_name
+        _player2_name = player2_name
+
+    def get_names(self):
+        return [_player1_name, _player2_name]
+
+    @staticmethod
+    def get_addresses():
+        return _all_addresses
 
     @staticmethod
     def set_player(addr, player_name):
@@ -38,7 +53,6 @@ class Watchdog:
     def _expire(self):
         from server import send_all
         from server import send_msg
-        from server import play_again_player
 
         send_all(f"Partida Encerrada, Jogador P{_active_player} ({_player_name}) está AFK e perdeu 1 ponto no Scoreboard Geral\n", _all_addresses)
         send_msg("terminate", _active_address)
@@ -69,14 +83,20 @@ class Watchdog:
         read_db.close()
         edit_db.close()
 
-        #Pergunta se quer jogar de novo para o jogador que não estava Afk
-        if _active_address == _all_addresses[0]:
-            play_again_player(_all_addresses[1])
-        else:
-            play_again_player(_all_addresses[0])
-
         print("\nWatchdog expire")
-        self.do_expire()
+
+        #Mandar o jogador que não estava Afk fechar
+        if _active_address == _all_addresses[0]:
+            send_msg("terminate",_all_addresses[1])
+        else:
+            send_msg("terminate",_all_addresses[0])
+
+
+        os.kill(os.getpid(), signal.SIGINT)
+
+
+
+
 
     def start(self):
         if self._t is None:
