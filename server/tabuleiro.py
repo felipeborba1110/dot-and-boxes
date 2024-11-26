@@ -1,4 +1,4 @@
-from cliente.terminal import T_BBLUE, T_FBLACK, T_RESET, T_BGREEN
+from client.terminal import T_BBLUE, T_FBLACK, T_RESET, T_BGREEN
 
 
 class Tabuleiro:
